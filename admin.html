@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6fa;
+      margin: 0;
+    }
+    header {
+      background: #0e3d59;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+    nav ul li {
+      display: inline-block;
+      margin: 0 10px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 20px auto;
+      flex-wrap: wrap;
+    }
+    .tab-button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #e0e0e0;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 6px;
+    }
+    .tab-button.active {
+      background: #0e3d59;
+      color: white;
+    }
+    section {
+      max-width: 1000px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #0e3d59;
+    }
+    .booking-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .booking-form label,
+    .booking-form input,
+    .booking-form select,
+    .booking-form button {
+      margin: 6px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Panel - Hotel Paradise</h1>
+    <nav>
+      <ul>
+        <li><a href="#" onclick="logout()">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-button active" onclick="showTab('users')">Registered Users</button>
+    <button class="tab-button" onclick="showTab('bookings')">Bookings</button>
+    <button class="tab-button" onclick="showTab('addBooking')">Add Booking</button>
+  </div>
+
+  <section>
+    <div id="users" class="tab-content active">
+      <h2>Registered Users</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Adress</th><th>Id Number</th></tr></thead>
+        <tbody id="userList"></tbody>
+      </table>
+    </div>
+
+    <div id="bookings" class="tab-content">
+      <h2>Bookings</h2>
+      <div class="tabs">
+        <button class="tab-button active" onclick="toggleBookingView('upcoming')">Upcoming Bookings</button>
+        <button class="tab-button" onclick="toggleBookingView('past')">Past Bookings</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Room Type</th><th>Room No</th><th>Check-In</th><th>Check-Out</th><th>Bill</th><th>Remark</th><th>Action</th></tr></thead>
+        <tbody id="bookingList"></tbody>
+      </table>
+    </div>
+
+    <div id="addBooking" class="tab-content">
+      <h2>Add Booking</h2>
+      <div class="booking-form">
+        <label>Customer Name</label>
+        <input type="text" id="adminName">
+
+        <label>Customer Email</label>
+        <input type="email" id="adminEmail">
+
+        <label>Room Type</label>
+        <select id="adminRoomType" onchange="updateAdminRooms()">
+          <option value="">Select Room Type</option>
+          <option value="Deluxe Room">Deluxe Room</option>
+          <option value="Luxury Suite">Luxury Suite</option>
+          <option value="Simple Room">Simple Room</option>
+        </select>
+
+        <label>Available Room Numbers</label>
+        <select id="adminRoomNumber"></select>
+
+        <label>Check-In</label>
+        <input type="date" id="adminCheckIn" onchange="updateAdminRooms()">
+
+        <label>Check-Out</label>
+        <input type="date" id="adminCheckOut">
+
+        <label>Guests</label>
+        <input type="number" min="1" max="5" id="adminGuests">
+
+        <label>Payment Done</label>
+        <select id="adminPayment">
+          <option value="Paid">Paid</option>
+          <option value="Unpaid">Unpaid</option>
+        </select>
+
+        <button onclick="adminAddBooking()">Add Booking</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  const users = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+  let bookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+
+  function showTab(id) {
+    document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+    document.querySelector(`.tab-button[onclick*="${id}"]`).classList.add("active");
+    document.getElementById(id).classList.add("active");
+
+    if (id === 'bookings') renderBookings(); // Render bookings on tab switch
+  }
+
+  function toggleBookingView(type) {
+    renderBookings(type);
+  }
+
+  function calculateBill(roomType, checkIn, checkOut) {
+    const rateMap = {
+      "Deluxe Room": 3000,
+      "Luxury Suite": 2000,
+      "Simple Room": 1000
+    };
+    const rate = rateMap[roomType] || 0;
+    const days = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24));
+    return (rate * days) + " Rs";
+  }
+
+  function renderBookings(filter = 'upcoming') {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("bookingList").innerHTML = bookings.map((b, i) => {
+      const isUpcoming = b.checkIn >= today;
+      if ((filter === 'upcoming' && isUpcoming) || (filter === 'past' && !isUpcoming)) {
+        return `<tr>
+          <td>${i + 1}</td>
+          <td>${b.name}</td>
+          <td>${b.roomType}</td>
+          <td>${b.roomNumber}</td>
+          <td>${b.checkIn}</td>
+          <td>${b.checkOut}</td>
+          <td>${b.bill}</td>
+          <td>${b.payment}</td>
+          <td><button onclick="cancelBooking(${i})">Cancel</button></td>
+        </tr>`;
+      }
+      return '';
+    }).join("");
+  }
+
+  document.getElementById("userList").innerHTML = users.map((u, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${u.name}</td>
+      <td>${u.email}</td>
+      <td>${u.mobile || 'N/A'}</td>
+      <td>${u.Adress || 'N/A'}</td>
+      <td>${u.idNumber || 'N/A'}</td>
+    </tr>
+  `).join("");
+
+  function updateAdminRooms() {
+    const roomMap = {
+      "Deluxe Room": ["001", "002", "003"],
+      "Luxury Suite": ["004", "005", "006"],
+      "Simple Room": ["007", "008", "009"]
+    };
+    const type = document.getElementById("adminRoomType").value;
+    const checkIn = document.getElementById("adminCheckIn").value;
+    const takenRooms = bookings
+      .filter(b => b.roomType === type && b.checkIn === checkIn)
+      .map(b => b.roomNumber);
+    const options = (roomMap[type] || []).filter(r => !takenRooms.includes(r));
+    const select = document.getElementById("adminRoomNumber");
+    select.innerHTML = '<option value="">Select Room</option>' + options.map(r => `<option value="${r}">${r}</option>`).join("");
+  }
+
+  function adminAddBooking() {
+    const name = document.getElementById("adminName").value.trim();
+    const email = document.getElementById("adminEmail").value.trim();
+    const roomType = document.getElementById("adminRoomType").value;
+    const roomNumber = document.getElementById("adminRoomNumber").value;
+    const checkIn = document.getElementById("adminCheckIn").value;
+    const checkOut = document.getElementById("adminCheckOut").value;
+    const guests = document.getElementById("adminGuests").value;
+    const payment = document.getElementById("adminPayment").value;
+
+    if (!name || !email || !roomType || !roomNumber || !checkIn || !checkOut || !guests) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    // Prevent duplicate or past bookings
+    const duplicate = bookings.some(b => b.roomNumber === roomNumber && b.checkIn === checkIn);
+    if (duplicate) {
+      alert("This room is already booked on selected date.");
+      return;
+    }
+
+    const bill = calculateBill(roomType, checkIn, checkOut);
+
+    const booking = {
+      name,
+      email,
+      roomType,
+      roomNumber,
+      checkIn,
+      checkOut,
+      guests,
+      payment,
+      bill
+    };
+
+    bookings.push(booking);
+    localStorage.setItem("hotelBookings", JSON.stringify(bookings));
+    alert("Booking added successfully");
+    showTab("bookings");
+  }
+
+  function cancelBooking(index) {
+    if (confirm("Cancel this booking?")) {
+      bookings.splice(index, 1);
+      localStorage.setItem("hotelBookings", JSON.stringify(bookings));
+      renderBookings();
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+  }
+
+  renderBookings();
+</script>
+
+</body>
+</html>

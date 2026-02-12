@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+ <header>
+  <h1 style="text-align:center;">Hotel Paradise</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="index.html" >Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="booking.html">Booking</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" id="registerLink">Register</a></li>
+      <li><a href="login.html" class="active" id="loginLink">Login</a></li>
+      <li id="userGreeting" style="display: none;"></li>
+      <li><a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+  <section class="form-section">
+    <h2>Login</h2>
+    <div class="booking-form">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="loginUser()">Login</button>
+  <p style="margin-top:10px;"><a href="forgot-password.html">Forgot Password?</a></p>
+</div>
+
+  </section>
+
+  <script>
+    function loginUser() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const users = JSON.parse(localStorage.getItem("hotelUsers")) || [];
+
+      // Admin login
+      if (email === "admin@hotel.com" && password === "admin123") {
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          email: email,
+          name: "Admin",
+          role: "admin"
+        }));
+        showMessage("Welcome, Admin!");
+        window.location.href = "admin.html";
+        return;
+      }
+
+      // Regular user login
+      const foundUser = users.find(u => u.email === email && u.password === password);
+      if (foundUser) {
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          email: foundUser.email,
+          name: foundUser.name,
+          role: "user"
+        }));
+        showMessage("Login successful!");
+        window.location.href = "dashboard.html";
+      } else {
+        showMessage("Invalid credentials!");
+      }
+    }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+  function toggleMenu() {
+    const nav = document.querySelector("nav ul");
+    nav.classList.toggle("show");
+  }
+  function showMessage(msg) {
+  const popup = document.getElementById("popupMessage");
+  const popupText = document.getElementById("popupText");
+  popupText.textContent = msg;
+  popup.style.display = "block";
+
+  // Remove after animation
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 3000);
+}
+
+
+  </script>
+  <div id="popupMessage" style="display: none;">
+  <p id="popupText"></p>
+</div>
+</body>
+</html>

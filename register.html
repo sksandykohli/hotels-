@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    label.required::after {
+      content: " *";
+      color: red;
+    }
+    .error-msg {
+      color: red;
+      font-size: 0.85em;
+      display: none;
+    }
+    input:invalid {
+      border-color: red;
+    }
+    .booking-form input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1 style="text-align:center;">Hotel Paradise</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="index.html" >Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="booking.html">Booking</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" class="active" id="registerLink">Register</a></li>
+      <li><a href="login.html" id="loginLink">Login</a></li>
+      <li id="userGreeting" style="display: none;"></li>
+      <li><a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="form-section">
+  <h2>Register</h2>
+  <div class="booking-form">
+    <div class="form-group">
+      <label class="required">Full Name</label>
+      <input type="text" id="name" placeholder="Full Name" />
+      <div class="error-msg" id="nameError">Please enter your full name</div>
+    </div>
+
+    <div class="form-group">
+      <label class="required">Email</label>
+      <input type="email" id="email" placeholder="Email" />
+      <div class="error-msg" id="emailError">Please enter a valid email</div>
+    </div>
+
+    <div class="form-group">
+      <label class="required">Password</label>
+      <input type="password" id="password" placeholder="Password" />
+      <div class="error-msg" id="passwordError">Please enter a password</div>
+    </div>
+
+    <div class="form-group">
+      <label class="required">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" />
+      <div class="error-msg" id="confirmError">Passwords do not match</div>
+    </div>
+
+    <div class="form-group">
+      <label>Mobile Number (Optional)</label>
+      <input type="tel" id="mobile" placeholder="10-digit Mobile Number" maxlength="10" pattern="[0-9]{10}" />
+      <div class="error-msg" id="mobileError">Please enter a valid 10-digit number</div>
+    </div>
+
+    <div class="form-group">
+      <label>Adress (Optional)</label>
+      <input type="text" id="adress" placeholder="Adress" />
+    </div>
+
+    <div class="form-group">
+      <label>ID Number (Optional)</label>
+      <input type="text" id="idNumber" placeholder="ID Number" />
+    </div>
+
+    <button onclick="register()">Register</button>
+  </div>
+</section>
+
+<script>
+  function register() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const mobile = document.getElementById("mobile").value.trim();
+    const Adress = document.getElementById("adress").value.trim();
+
+    const idNumber = document.getElementById("idNumber").value.trim();
+
+    const nameErr = document.getElementById("nameError");
+    const emailErr = document.getElementById("emailError");
+    const passErr = document.getElementById("passwordError");
+    const confirmErr = document.getElementById("confirmError");
+    const mobileErr = document.getElementById("mobileError");
+
+    nameErr.style.display = "none";
+    emailErr.style.display = "none";
+    passErr.style.display = "none";
+    confirmErr.style.display = "none";
+    mobileErr.style.display = "none";
+
+    let isValid = true;
+
+    if (!name) {
+      nameErr.style.display = "block";
+      isValid = false;
+    }
+    if (!email || !email.includes("@") || !email.includes(".")) {
+      emailErr.style.display = "block";
+      isValid = false;
+    }
+    if (!password) {
+      passErr.style.display = "block";
+      isValid = false;
+    }
+    if (password !== confirmPassword) {
+      confirmErr.style.display = "block";
+      isValid = false;
+    }
+    if (mobile && !/^\d{10}$/.test(mobile)) {
+      mobileErr.style.display = "block";
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    let users = JSON.parse(localStorage.getItem("hotelUsers")) || [];
+
+    if (users.find(u => u.email === email)) {
+      alert("User with this email already exists.");
+      return;
+    }
+
+    const newUser = {
+      name,
+      email,
+      password,
+      mobile,
+      Adress,
+      idNumber,
+      role: "user" // important for admin panel access control
+    };
+
+    users.push(newUser);
+
+    // Save to both keys
+    localStorage.setItem("hotelUsers", JSON.stringify(users));
+    localStorage.setItem("registeredUsers", JSON.stringify(users));
+
+    alert("Registered successfully!");
+    window.location.href = "login.html";
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+  function toggleMenu() {
+    const nav = document.querySelector("nav ul");
+    nav.classList.toggle("show");
+  }
+
+</script>
+
+</body>
+</html>

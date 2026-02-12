@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Room - Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+<header>
+  <h1 style="text-align:center;">Hotel Paradise</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="index.html" >Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="booking.html" class="active">Booking</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" id="registerLink">Register</a></li>
+      <li><a href="login.html" id="loginLink">Login</a></li>
+      <li id="userGreeting" style="display: none;"></li>
+      <li><a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="form-section">
+  <h2 id="bookingTitle">Book a Room</h2>
+  <p id="loginWarning" style="display: none; color: red; font-weight: bold; animation: blinker 1s linear infinite; text-align: center;">
+    ⚠️ Please login or register first to book a room!
+  </p>
+  <div class="booking-form">
+    <label>Room Type</label>
+    <select id="roomType" onchange="updateRoomOptions()">
+      <option value="">-- Select Room Type --</option>
+      <option value="Deluxe Room">Deluxe Room</option>
+      <option value="Luxury Suite">Luxury Suite</option>
+      <option value="Simple Room">Simple Room</option>
+    </select>
+
+    <label>Available Room Numbers</label>
+    <select id="roomNumber">
+      <option value="">-- Select Room Number --</option>
+    </select>
+
+    <label>Room Price</label>
+    <input type="text" id="roomPrice" disabled />
+
+    <label>Check-In</label>
+    <input type="date" id="checkIn">
+
+    <label>Check-Out</label>
+    <input type="date" id="checkOut">
+
+    <label>Number of Guests (1–5)</label>
+    <input type="number" id="guests" min="1" max="5">
+
+    <button onclick="bookRoom()">Book Now</button>
+  </div>
+</section>
+
+<script>
+  const roomData = {
+    "Deluxe Room": { rooms: ["001", "002", "003"], price: 3000 },
+    "Luxury Suite": { rooms: ["004", "005", "006"], price: 2000 },
+    "Simple Room": { rooms: ["007", "008", "009"], price: 1000 }
+  };
+
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("checkIn").setAttribute("min", today);
+  document.getElementById("checkOut").setAttribute("min", today);
+
+  function updateRoomOptions() {
+    const type = document.getElementById("roomType").value;
+    const roomNumberSelect = document.getElementById("roomNumber");
+    const priceField = document.getElementById("roomPrice");
+
+    roomNumberSelect.innerHTML = '<option value="">-- Select Room Number --</option>';
+    priceField.value = roomData[type]?.price ? `₹${roomData[type].price}` : "";
+
+    if (!type) return;
+
+    const bookedRooms = getBookedRooms(type);
+    const availableRooms = roomData[type].rooms.filter(r => !bookedRooms.includes(r));
+
+    availableRooms.forEach(room => {
+      const opt = document.createElement("option");
+      opt.value = room;
+      opt.textContent = `Room No: ${room}`;
+      roomNumberSelect.appendChild(opt);
+    });
+  }
+
+  function getBookedRooms(type) {
+    const checkIn = document.getElementById("checkIn").value;
+    const checkOut = document.getElementById("checkOut").value;
+    const bookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+
+    return bookings
+      .filter(b => b.roomType === type && (
+        (checkIn && checkOut && (
+          (checkIn >= b.checkIn && checkIn < b.checkOut) ||
+          (checkOut > b.checkIn && checkOut <= b.checkOut) ||
+          (checkIn <= b.checkIn && checkOut >= b.checkOut)
+        ))
+      ))
+      .map(b => b.roomNumber);
+  }
+
+function bookRoom() {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+if (!user) return showMessage("⚠️ Please login first");
+
+  const roomType = document.getElementById("roomType").value;
+  const roomNumber = document.getElementById("roomNumber").value;
+  const checkIn = document.getElementById("checkIn").value;
+  const checkOut = document.getElementById("checkOut").value;
+  const guests = parseInt(document.getElementById("guests").value);
+
+  if (!roomType || !roomNumber || !checkIn || !checkOut || !guests) {
+    return showMessage("Please fill in all fields.");
+  }
+
+  if (guests < 1 || guests > 5) return alert("Guests must be between 1 and 5");
+  if (new Date(checkIn) < new Date(today)) return alert("Check-in date cannot be in the past");
+  if (new Date(checkOut) <= new Date(checkIn)) return alert("Check-out must be after check-in");
+
+  const oneDay = 24 * 60 * 60 * 1000;
+  const days = Math.round((new Date(checkOut) - new Date(checkIn)) / oneDay);
+  const basePrice = roomData[roomType]?.price || 0;
+  const totalBill = basePrice * days;
+
+  const booking = {
+    email: user.email,
+    name: user.name,
+    roomType,
+    roomNumber,
+    checkIn,
+    checkOut,
+    guests,
+    bill: `${totalBill} Rs`,
+    remark: "Unpaid",
+    paymentDone: false
+  };
+
+  const bookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+
+  const conflict = bookings.find(b =>
+    b.roomType === roomType &&
+    b.roomNumber === roomNumber &&
+    (
+      (checkIn >= b.checkIn && checkIn < b.checkOut) ||
+      (checkOut > b.checkIn && checkOut <= b.checkOut) ||
+      (checkIn <= b.checkIn && checkOut >= b.checkOut)
+    )
+  );
+
+  if (conflict) return alert("Selected room is already booked for the chosen dates.");
+
+  bookings.push(booking);
+  localStorage.setItem("hotelBookings", JSON.stringify(bookings));
+  showMessage("Booking successful! Thank you.");
+  window.location.href = "dashboard.html";
+}
+</script>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+  const userGreeting = document.getElementById("userGreeting");
+  const logoutLink = document.getElementById("logoutLink");
+  const loginLink = document.getElementById("loginLink");
+  const registerLink = document.getElementById("registerLink");
+  const loginWarning = document.getElementById("loginWarning");
+
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (loggedInUser) {
+    userGreeting.style.display = "inline";
+    logoutLink.style.display = "inline";
+    userGreeting.innerHTML = `<i class="fa fa-user"></i> <a href="dashboard.html" style="color: white; text-decoration: none;">Hello, ${loggedInUser.name}</a>`;
+
+    if (loginLink) loginLink.style.display = "none";
+    if (registerLink) registerLink.style.display = "none";
+  } else {
+    // ✅ Show warning, but keep form enabled
+    loginWarning.style.display = "block";
+  }
+});
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+  function toggleMenu() {
+    const nav = document.querySelector("nav ul");
+    nav.classList.toggle("show");
+  }
+function showMessage(msg) {
+  const popup = document.getElementById("popupMessage");
+  const popupText = document.getElementById("popupText");
+  popupText.textContent = msg;
+  popup.style.display = "block";
+
+  // Remove after animation
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 3000);
+}
+
+
+</script>
+<div id="popupMessage" style="display: none;">
+  <p id="popupText"></p>
+</div>
+
+</body>
+</html>

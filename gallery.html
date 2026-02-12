@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gallery – Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+ 
+</head>
+<body>
+
+ <header>
+  <h1 style="text-align:center;">Hotel Paradise</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="index.html" >Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="booking.html">Booking</a></li>
+      <li><a href="gallery.html"class="active">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" id="registerLink">Register</a></li>
+      <li><a href="login.html" id="loginLink">Login</a></li>
+      <li id="userGreeting" style="display: none;"></li>
+      <li><a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+  <section class="gallery-section">
+    <h2>Photo Gallery</h2>
+    <div class="gallery-grid" id="gallery">
+      <!-- Images -->
+      <img src="/hotel-website/images/Room/Room1.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room2.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room3.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room4.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room5.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room6.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room7.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room8.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room9.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room10.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room11.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room12.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room13.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room14.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room15.jpg" alt="Lobby" />
+      <img src="/hotel-website/images/Room/Room16.jpg" alt="Lobby" />
+     
+    </div>
+  </section>
+
+  <!-- Modal for Image Viewer -->
+  <div class="modal" id="imageModal">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <img id="modalImage" src="" alt="Gallery View">
+    <div class="modal-controls">
+      <button onclick="prevImage()">⟨ Prev</button>
+      <button onclick="nextImage()">Next ⟩</button>
+    </div>
+  </div>
+<div class="info-sections">
+
+  <div class="info-box">
+     <h2><i class="fa-solid fa-hotel"></i> Popular Facilities</h2>
+     <p><i class="fa-solid fa-broom"></i> Daily Housekeeping</p>
+    <p><i class="fa-solid fa-bath"></i> Attached Bathroom</p>
+    <p><i class="fa-solid fa-utensils"></i> Dining Area</p>
+    <p><i class="fa-solid fa-wifi"></i> Free Wi-Fi</p>
+  </div>
+
+  <div class="info-box">
+    <h2><i class="fa-solid fa-clipboard-list"></i> Policies</h2>
+    <h3>Check-In / Check-Out</h3>
+    <p>Check-In: 12:00 PM</p>
+    <p>Check-Out: 11:00 AM</p>
+    <h3>ID Proof Required</h3>
+    <p>Aadhar, Driving License, Passport</p>
+  </div>
+</div>
+
+ <div style="text-align: center; margin-top: 40px;">
+<h2><i class="fa-solid fa-phone"></i> Contact Us</h2>
+    <p><i class="fa-solid fa-location-dot"></i> Beach Road, Paradise City, India</p>
+    <p><i class="fa-solid fa-envelope"></i> contact@hotelparadise.com</p>
+    <p><i class="fa-solid fa-phone"></i> +91-9876543210</p></div>
+
+  <footer>
+    <p>© 2025 Hotel Paradise | All rights reserved.</p>
+  </footer>
+
+
+  <script>
+    const galleryImages = [...document.querySelectorAll("#gallery img")];
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    let currentIndex = 0;
+
+    galleryImages.forEach((img, index) => {
+      img.addEventListener("click", () => {
+        currentIndex = index;
+        modalImg.src = img.src;
+        modal.style.display = "flex";
+      });
+    });
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % galleryImages.length;
+      modalImg.src = galleryImages[currentIndex].src;
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+      modalImg.src = galleryImages[currentIndex].src;
+    }
+
+    // Close modal on background click
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const userGreeting = document.getElementById("userGreeting");
+    const logoutLink = document.getElementById("logoutLink");
+    const loginLink = document.getElementById("loginLink");
+    const registerLink = document.getElementById("registerLink");
+
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (loggedInUser) {
+      userGreeting.style.display = "inline";
+      logoutLink.style.display = "inline";
+           userGreeting.innerHTML = `<i class="fa fa-user"></i> <a href="dashboard.html" style="color: white; text-decoration: none;">Hello, ${loggedInUser.name}</a>`;
+
+
+      // Hide login/register
+      if (loginLink) loginLink.style.display = "none";
+      if (registerLink) registerLink.style.display = "none";
+    }
+  });
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+  function toggleMenu() {
+    const nav = document.querySelector("nav ul");
+    nav.classList.toggle("show");
+  }
+
+</script>
+</body>
+</html>

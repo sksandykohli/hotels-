@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2e8b57;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav ul {
+      display: flex;
+      justify-content: center;
+      padding: 0;
+      list-style: none;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .form-section {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e8b57;
+    }
+
+    .booking-item {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fdfdfd;
+      position: relative;
+    }
+
+    .booking-item input,
+    .booking-item select {
+      width: 100%;
+      margin: 5px 0 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .booking-item button {
+      margin-right: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background: #007bff;
+      color: white;
+    }
+
+    .save-btn {
+      background: #28a745;
+      color: white;
+    }
+
+    .cancel-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    .badge {
+      background-color: #888;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+
+    .badge.past {
+      background-color: #999;
+    }
+
+    .badge.upcoming {
+      background-color: #2e8b57;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hotel Paradise</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="rooms.html">Rooms</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="booking.html">Booking</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="register.html">Register</a></li>
+        <li><a href="#" onclick="logout()" class="active">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+<section class="form-section">
+  <h2>Welcome, <span id="userName">Guest</span></h2>
+
+  <div class="booking-category">
+    <h3 class="category-title">Upcoming Bookings</h3>
+    <div id="upcomingBookings" class="booking-list"></div>
+  </div>
+
+  <div class="booking-category">
+    <h3 class="category-title">Past Bookings</h3>
+    <div id="pastBookings" class="booking-list"></div>
+  </div>
+</section>
+
+
+<script>
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!user) {
+    alert("Please login");
+    window.location.href = "login.html";
+  } else {
+    document.getElementById("userName").innerText = user.name;
+    loadBookings();
+  }
+
+  function loadBookings() {
+    const allBookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+    const userBookings = allBookings.filter(b => b.email === user.email);
+    const today = new Date().toISOString().split("T")[0];
+
+    const upcomingList = document.getElementById("upcomingBookings");
+    const pastList = document.getElementById("pastBookings");
+
+    upcomingList.innerHTML = "";
+    pastList.innerHTML = "";
+
+    if (userBookings.length === 0) {
+      upcomingList.innerHTML = "<p>No bookings found.</p>";
+      pastList.innerHTML = "";
+      return;
+    }
+
+    userBookings.forEach((b, index) => {
+      const isPast = new Date(b.checkOut) < new Date(today);
+      const isPaid = b.paymentDone === true;
+
+      const item = document.createElement("div");
+      item.className = "booking-item";
+      item.id = `booking-${index}`;
+      item.innerHTML = `
+        <span class="badge ${isPast ? 'past' : 'upcoming'}">
+          ${isPast ? 'Past Booking' : 'Upcoming'}
+        </span>
+        ${isPaid ? `<span class="badge" style="background:#1abc9c; right: 110px;">Paid</span>` : ''}
+        <p><strong>Room:</strong> <span id="roomTypeText-${index}">${b.roomType}</span></p>
+        <p><strong>Check-In:</strong> ${b.checkIn}</p>
+        <p><strong>Check-Out:</strong> ${b.checkOut}</p>
+        <p><strong>Guests:</strong> <span id="guestsText-${index}">${b.guests}</span></p>
+        ${
+          isPast || isPaid
+            ? ''
+            : `
+          <div id="editFields-${index}" style="display:none">
+            <label>Room Type:
+              <select id="roomType-${index}">
+                <option value="Deluxe Room">Deluxe Room</option>
+                <option value="Luxury Suite">Luxury Suite</option>
+              </select>
+            </label>
+            <label>Guests:
+              <input type="number" id="guests-${index}" value="${b.guests}" min="1">
+            </label>
+            <button class="save-btn" onclick="saveBooking(${index})">Save</button>
+          </div>
+          <button class="edit-btn" onclick="enableEdit(${index}, '${b.roomType}', ${b.guests})">Edit</button>
+          <button class="cancel-btn" onclick="cancelBooking(${index})">Cancel Booking</button>
+          <button class="save-btn" onclick="makePayment(${index})">Make Payment</button>
+        `
+        }
+      `;
+
+      isPast ? pastList.appendChild(item) : upcomingList.appendChild(item);
+    });
+  }
+
+  function enableEdit(index, roomType, guests) {
+    document.getElementById(`editFields-${index}`).style.display = "block";
+    document.getElementById(`roomType-${index}`).value = roomType;
+    document.getElementById(`guests-${index}`).value = guests;
+  }
+
+  function saveBooking(index) {
+    const newGuests = document.getElementById(`guests-${index}`).value;
+    const newRoomType = document.getElementById(`roomType-${index}`).value;
+
+    let allBookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    let count = -1;
+    const bookingIndex = allBookings.findIndex(b => {
+      if (b.email === user.email) count++;
+      return b.email === user.email && count === index;
+    });
+
+    if (bookingIndex !== -1) {
+      allBookings[bookingIndex].guests = newGuests;
+      allBookings[bookingIndex].roomType = newRoomType;
+      localStorage.setItem("hotelBookings", JSON.stringify(allBookings));
+      alert("Booking updated.");
+      loadBookings();
+    }
+  }
+
+  function cancelBooking(index) {
+    let allBookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    let count = -1;
+    const bookingToCancel = allBookings.find((b, i) => {
+      if (b.email === user.email) count++;
+      return b.email === user.email && count === index;
+    });
+    allBookings = allBookings.filter(b => b !== bookingToCancel);
+    localStorage.setItem("hotelBookings", JSON.stringify(allBookings));
+    alert("Booking cancelled.");
+    loadBookings();
+  }
+
+  function makePayment(index) {
+    let allBookings = JSON.parse(localStorage.getItem("hotelBookings")) || [];
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    let count = -1;
+    const bookingIndex = allBookings.findIndex(b => {
+      if (b.email === user.email) count++;
+      return b.email === user.email && count === index;
+    });
+
+    if (bookingIndex !== -1) {
+      allBookings[bookingIndex].paymentDone = true;
+      localStorage.setItem("hotelBookings", JSON.stringify(allBookings));
+      alert("Payment successful!");
+      loadBookings();
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    alert("Logged out");
+    window.location.href = "login.html";
+  }
+</script>
+
+</body>
+</html>

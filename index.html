@@ -1,0 +1,230 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Hotel Paradise</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  </head>
+
+  <body>
+
+   <header>
+  <h1 style="text-align:center;">Hotel Paradise</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="booking.html">Booking</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" id="registerLink">Register</a></li>
+      <li><a href="login.html" id="loginLink">Login</a></li>
+      <li id="userGreeting" style="display: none;"></li>
+      <li><a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+  <section class="hero">
+  <h2>Welcome to Luxury & Comfort</h2>
+  <p>Book your perfect stay with us</p>
+  <a href="booking.html" class="btn">Book Now</a>
+</section>
+
+
+    
+
+    <div style="text-align: center; margin-top: 40px;">
+      <h2>Our Rooms</h2>
+    </div>
+
+    <section class="rooms">
+      <div class="room-card" onclick="showRoomDetails('Homeroom1.jpg', 'Deluxe Room', '₹3,000/night – AC, WiFi, Breakfast')">
+        <img src="images/Homeroom1.jpg" alt="Deluxe Room" />
+        <h3>Deluxe Room</h3>
+        <p>AC, WiFi, Breakfast</p>
+      </div>
+      <div class="room-card" onclick="showRoomDetails('Homeroom2.jpg', 'Luxury Suite', '₹5,000/night – King Bed, Bathtub, Sea View')">
+        <img src="images/Homeroom2.jpg" alt="Luxury Suite" />
+        <h3>Luxury Suite</h3>
+        <p>King Bed, Bathtub, Sea View</p>
+      </div>
+      <div class="room-card" onclick="showRoomDetails('Homeroom3.jpg', 'Deluxe Room', '₹3,000/night – AC, WiFi, Breakfast')">
+        <img src="images/Homeroom3.jpg" alt="Deluxe Room" />
+        <h3>Deluxe Room</h3>
+        <p>AC, WiFi, Breakfast</p>
+      </div>
+    </section>
+  <!-- Signature Dining Section -->
+<section class="dining-section">
+  <div class="dining-header">
+    <h2>Signature Dining</h2>
+    <p>Experience world-class cuisines crafted by our master chefs.</p>
+  </div>
+
+  <div class="carousel-wrapper">
+    <div class="carousel">
+      <!-- Original Set -->
+      <div class="dining-card">
+        <img src="images/dining1.png" alt="Royal Feast" />
+        <h3>The Royal Feast</h3>
+        <p>Luxury Indian thali served in a royal ambience.</p>
+      </div>
+      <div class="dining-card">
+        <img src="images/dining2.png" alt="Sea Breeze Lounge" />
+        <h3>Sea Breeze Lounge</h3>
+        <p>Enjoy cocktails and seafood with a sea view.</p>
+      </div>
+      <div class="dining-card">
+        <img src="images/dining3.png" alt="Candlelight Courtyard" />
+        <h3>Candlelight Courtyard</h3>
+        <p>Romantic dinners under the stars in a private setting.</p>
+      </div>
+
+      <!-- Duplicate Set for seamless loop -->
+      <div class="dining-card">
+        <img src="images/dining1.png" alt="Royal Feast" />
+        <h3>The Royal Feast</h3>
+        <p>Luxury Indian thali served in a royal ambience.</p>
+      </div>
+      <div class="dining-card">
+        <img src="images/dining2.png" alt="Sea Breeze Lounge" />
+        <h3>Sea Breeze Lounge</h3>
+        <p>Enjoy cocktails and seafood with a sea view.</p>
+      </div>
+      <div class="dining-card">
+        <img src="images/dining3.png" alt="Candlelight Courtyard" />
+        <h3>Candlelight Courtyard</h3>
+        <p>Romantic dinners under the stars in a private setting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <script>
+    function openMenu(title, desc, img) {
+      document.getElementById('menuTitle').innerText = title;
+      document.getElementById('menuDesc').innerText = desc;
+      document.getElementById('menuImage').src = 'images/' + img;
+      document.getElementById('menuPopup').style.display = 'flex';
+    }
+
+    function closeMenu(event) {
+      if (
+        event.target.classList.contains('popup-overlay') ||
+        event.target.classList.contains('close-btn')
+      ) {
+        document.getElementById('menuPopup').style.display = 'none';
+      }
+    }
+  </script>
+</section>
+  
+
+  <!-- Dining Popup Modal -->
+  <div id="menuPopup" class="popup-overlay" onclick="closeMenu(event)">
+    <div class="popup-box">
+      <span class="close-btn" onclick="closeMenu(event)">&times;</span>
+      <img id="menuImage" src="" alt="Dining Menu Image" />
+      <h3 id="menuTitle"></h3>
+      <p id="menuDesc"></p>
+    </div>
+  </div>
+
+
+    <div class="info-sections">
+      <div class="info-box">
+        <h2><i class="fa-solid fa-hotel"></i> Popular Facilities</h2>
+        <p><i class="fa-solid fa-broom"></i> Daily Housekeeping </p>
+        <p><i class="fa-solid fa-bath"></i> Attached Bathroom</p>
+        <p><i class="fa-solid fa-utensils"></i> Dining Area</p>
+        <p><i class="fa-solid fa-wifi"></i> Free Wi-Fi</p>
+      </div>
+      <div class="info-box">
+        <h2><i class="fa-solid fa-clipboard-list"></i> Policies</h2>
+        <h3>Check-In / Check-Out</h3>
+        <p>Check-In: 12:00 PM</p>
+        <p>Check-Out: 11:00 AM</p>
+        <h3>ID Proof Required</h3>
+        <p>Aadhar, Driving License, Passport</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <h2><i class="fa-solid fa-phone"></i> Contact Us</h2>
+      <p><i class="fa-solid fa-location-dot"></i> Beach Road, Paradise City, India</p>
+      <p><i class="fa-solid fa-envelope"></i> contact@hotelparadise.com</p>
+      <p><i class="fa-solid fa-phone"></i> +91-9876543210</p>
+    </div>
+
+    <footer>
+      <p>© 2025 Hotel Paradise | All rights reserved.</p>
+    </footer>
+
+    <!-- Room Detail Popup -->
+    <div id="roomDetailPopup" class="popup-overlay" onclick="closeRoomDetails(event)">
+      <div class="popup-box">
+        <span class="close-btn" onclick="closeRoomDetails(event)">&times;</span>
+        <img id="popupImage" src="" alt="Room Image" />
+        <h3 id="popupTitle"></h3>
+        <p id="popupDesc"></p>
+      </div>
+    </div>
+
+    <script>
+      function showRoomDetails(img, title, desc) {
+        document.getElementById('popupImage').src = 'images/' + img;
+        document.getElementById('popupTitle').innerText = title;
+        document.getElementById('popupDesc').innerText = desc;
+        document.getElementById('roomDetailPopup').style.display = 'flex';
+      }
+
+      function closeRoomDetails(event) {
+        if (
+          event.target.classList.contains('popup-overlay') ||
+          event.target.classList.contains('close-btn')
+        ) {
+          document.getElementById('roomDetailPopup').style.display = 'none';
+        }
+      }
+    </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const userGreeting = document.getElementById("userGreeting");
+    const logoutLink = document.getElementById("logoutLink");
+    const loginLink = document.getElementById("loginLink");
+    const registerLink = document.getElementById("registerLink");
+
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (loggedInUser) {
+      userGreeting.style.display = "inline";
+      logoutLink.style.display = "inline";
+      userGreeting.innerHTML = `<i class="fa fa-user"></i> <a href="dashboard.html" style="color: white; text-decoration: none;">Hello, ${loggedInUser.name}</a>`;
+
+      // Hide login/register
+      if (loginLink) loginLink.style.display = "none";
+      if (registerLink) registerLink.style.display = "none";
+    }
+  });
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+  function toggleMenu() {
+    const nav = document.querySelector("nav ul");
+    nav.classList.toggle("show");
+  }
+
+</script>
+
+
+
+  </body>
+  </html>

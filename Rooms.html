@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rooms – Hotel Paradise</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.95);
+    }
+
+    .modal-content {
+      position: relative;
+      margin: 5% auto;
+      max-width: 80%;
+      text-align: center;
+    }
+
+    .modal-content img {
+      width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .close, .prev, .next {
+      position: absolute;
+      color: #fff;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: default;
+      user-select: none;
+    }
+
+    .close {
+      top: 20px;
+      right: 40px;
+    }
+
+    .prev {
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+    }
+
+    .next {
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+    }
+
+    .room-card {
+      text-align: center;
+      padding: 15px;
+    }
+
+    .room-card img {
+      width: 100%;
+      max-width: 250px;
+      border-radius: 10px;
+      transition: transform 0.3s;
+    }
+
+    .room-card img:hover {
+      transform: scale(1.05);
+    }
+
+    .rooms {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin: 40px auto;
+      max-width: 1200px;
+    }
+
+    .room-type-title {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 28px;
+    }
+
+    .hero {
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .btn {
+      background: #fff;
+      color: #333;
+      padding: 10px 20px;
+      display: inline-block;
+      margin-top: 20px;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    header, footer {
+      background-color: #333;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+
+
+    /* Remove hand cursor */
+    .room-card, .prev, .next, .close {
+      cursor: default !important;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+  <h1 style="text-align:center;">Hotel Paradise</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+  </div>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="index.html" >Home</a></li>
+      <li><a href="rooms.html" class="active">Rooms</a></li>
+      <li><a href="booking.html">Booking</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" id="registerLink">Register</a></li>
+      <li><a href="login.html" id="loginLink">Login</a></li>
+      <li id="userGreeting" style="display: none;"></li>
+      <li><a href="#" id="logoutLink" style="display: none;" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+  
+</header>
+
+  <section class="hero" style="background: url('images/rooms-hero.jpg') no-repeat center center/cover;">
+    <h2>Explore Our Rooms</h2>
+    <p>Choose comfort, style, and luxury at the best prices</p>
+    <a href="booking.html" class="btn">Book Now</a>
+  </section>
+
+  <!-- Deluxe Room -->
+  <h2 class="room-type-title">Deluxe Room</h2>
+  <section class="rooms">
+    <div class="room-card" onclick="openModal('room001')">
+      <img src="images/Room/Room1.jpg" alt="Room 001">
+      <h3>Room No. 001</h3>
+    </div>
+    <div class="room-card" onclick="openModal('room002')">
+      <img src="images/Room/Room2.jpg" alt="Room 002">
+      <h3>Room No. 002</h3>
+    </div>
+    <div class="room-card" onclick="openModal('room003')">
+      <img src="images/Room/Room3.jpg" alt="Room 003">
+      <h3>Room No. 003</h3>
+    </div>
+  </section>
+
+  <!-- Luxury Suite -->
+  <h2 class="room-type-title">Luxury Suite</h2>
+  <section class="rooms">
+    <div class="room-card" onclick="openModal('room004')">
+      <img src="images/Room/Room4.jpg" alt="Room 004">
+      <h3>Room No. 004</h3>
+    </div>
+    <div class="room-card" onclick="openModal('room005')">
+      <img src="images/Room/Room5.jpg" alt="Room 005">
+      <h3>Room No. 005</h3>
+    </div>
+    <div class="room-card" onclick="openModal('room006')">
+      <img src="images/Room/Room6.jpg" alt="Room 006">
+      <h3>Room No. 006</h3>
+    </div>
+  </section>
+
+  <!-- Simple Room -->
+  <h2 class="room-type-title">Simple Room</h2>
+  <section class="rooms">
+    <div class="room-card" onclick="openModal('room007')">
+      <img src="images/Room/Room7.jpg" alt="Room 007">
+      <h3>Room No. 007</h3>
+    </div>
+    <div class="room-card" onclick="openModal('room008')">
+      <img src="images/Room/Room8.jpg" alt="Room 008">
+      <h3>Room No. 008</h3>
+    </div>
+    <div class="room-card" onclick="openModal('room009')">
+      <img src="images/Room/Room9.jpg" alt="Room 009">
+      <h3>Room No. 009</h3>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div id="imageModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <span class="prev" onclick="changeImage(-1)">&#10094;</span>
+    <div class="modal-content">
+      <img id="modalImage" src="" alt="Room Image">
+    </div>
+    <span class="next" onclick="changeImage(1)">&#10095;</span>
+  </div>
+
+  <!-- Info Sections -->
+     <div class="info-sections">
+      <div class="info-box">
+        <h2><i class="fa-solid fa-hotel"></i> Popular Facilities</h2>
+        <p><i class="fa-solid fa-broom"></i> Daily Housekeeping </p>
+        <p><i class="fa-solid fa-bath"></i> Attached Bathroom</p>
+        <p><i class="fa-solid fa-utensils"></i> Dining Area</p>
+        <p><i class="fa-solid fa-wifi"></i> Free Wi-Fi</p>
+      </div>
+      <div class="info-box">
+        <h2><i class="fa-solid fa-clipboard-list"></i> Policies</h2>
+        <h3>Check-In / Check-Out</h3>
+        <p>Check-In: 12:00 PM</p>
+        <p>Check-Out: 11:00 AM</p>
+        <h3>ID Proof Required</h3>
+        <p>Aadhar, Driving License, Passport</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <h2><i class="fa-solid fa-phone"></i> Contact Us</h2>
+      <p><i class="fa-solid fa-location-dot"></i> Beach Road, Paradise City, India</p>
+      <p><i class="fa-solid fa-envelope"></i> contact@hotelparadise.com</p>
+      <p><i class="fa-solid fa-phone"></i> +91-9876543210</p>
+    </div>
+
+
+  <footer>
+    <p>© 2025 Hotel Paradise | All rights reserved.</p>
+  </footer>
+
+  <script>
+    const imageSets = {
+      room001: ["images/Room/Room1.jpg", "images/Room/Room5.jpg"],
+      room002: ["images/Room/Room2.jpg", "images/Room/Room2_2.jpg"],
+      room003: ["images/Room/Room3.jpg", "images/Room/Room3_2.jpg"],
+      room004: ["images/Room/Room4.jpg", "images/Room/Room4_2.jpg"],
+      room005: ["images/Room/Room5.jpg", "images/Room/Room5_2.jpg"],
+      room006: ["images/Room/Room6.jpg", "images/Room/Room6_2.jpg"],
+      room007: ["images/Room/Room7.jpg", "images/Room/Room7_2.jpg"],
+      room008: ["images/Room/Room8.jpg", "images/Room/Room8_2.jpg"],
+      room009: ["images/Room/Room9.jpg", "images/Room/Room9_2.jpg"]
+    };
+
+    let currentSet = [], currentIndex = 0;
+
+    function openModal(setKey) {
+      currentSet = imageSets[setKey];
+      currentIndex = 0;
+      document.getElementById("modalImage").src = currentSet[currentIndex];
+      document.getElementById("imageModal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("imageModal").style.display = "none";
+    }
+
+    function changeImage(direction) {
+      currentIndex = (currentIndex + direction + currentSet.length) % currentSet.length;
+      document.getElementById("modalImage").src = currentSet[currentIndex];
+    }
+
+    // Close modal on outside click
+    window.onclick = function(e) {
+      if (e.target.id === "imageModal") closeModal();
+    };
+
+    // Escape key to close
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeModal();
+    });
+
+    // User greeting
+    document.addEventListener("DOMContentLoaded", function () {
+      const user = JSON.parse(localStorage.getItem("loggedInUser"));
+      if (user) {
+        document.getElementById("userGreeting").style.display = "inline";
+        document.getElementById("logoutLink").style.display = "inline";
+        document.getElementById("userGreeting").innerHTML =
+          `<i class="fa fa-user"></i> <a href="dashboard.html" style="color: white;">Hello, ${user.name}</a>`;
+        document.getElementById("loginLink").style.display = "none";
+        document.getElementById("registerLink").style.display = "none";
+      }
+    });
+
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "index.html";
+    }
+     function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "index.html";
+  }
+  function toggleMenu() {
+    const nav = document.querySelector("nav ul");
+    nav.classList.toggle("show");
+  }
+
+  </script>
+  
+</body>
+</html>
